@@ -17,7 +17,7 @@ Destinations can be added by specifying the `onFailure` or `onSuccess` props whe
 The following destinations are supported
 
 * Lambda function
-* SQS queue
+* Standard SQS queue
 * SNS topic
 * EventBridge event bus
 
@@ -35,6 +35,23 @@ const myFn = new lambda.Function(this, 'Fn', {
   onSuccess: new destinations.SnsDestination(myTopic)
 })
 ```
+
+Example with a SQS topic for unsuccessful invocations:
+
+```ts
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as destinations from '@aws-cdk/aws-lambda-destinations';
+import * as sqs from '@aws-cdk/aws-sqs';
+
+const deadLetterQueue = new sqs.Queue(this, 'DeadLetterQueue');;
+
+const myFn = new lambda.Function(this, 'Fn', {
+  // other props
+  onFailure: new destinations.SqsDestination(deadLetterQueue)
+})
+```
+
+*Only standard SQS queues are supported for failure destinations, FIFO queues are not supported.
 
 See also [Configuring Destinations for Asynchronous Invocation](https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html#invocation-async-destinations).
 
